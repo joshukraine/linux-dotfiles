@@ -2,7 +2,6 @@
 
 These are my dotfiles and general system preferences adapted for Debian-type Linux systems. This setup is intended for a personal development machine, not a web-facing server.
 
-
 ### Linux Bootstrap Script
 
 This repo previously contained my entire provisioning solution for a new machine running Linux. I've now extracted the provisioning functionality into its own repository. Check it out:
@@ -14,7 +13,7 @@ NOTE: Linux Bootstrap automatically clones and installs this dotfiles repo.
 
 ### Prerequisites
 
-The dotfiles assume you are running OS X (10.10 or higher) with the following software preinstalled:
+The dotfiles assume you are running Ubuntu 14.04 (or similar) with the following software preinstalled:
 
 * [Git](https://git-scm.com/)
 * [Vim](http://www.vim.org/)
@@ -23,12 +22,12 @@ The dotfiles assume you are running OS X (10.10 or higher) with the following so
 * [Ruby](https://www.ruby-lang.org/en/)
 * [rbenv](https://github.com/sstephenson/rbenv)
 
-All of the above and more are included in [Mac Bootstrap](https://github.com/joshukraine/mac-bootstrap).
+All of the above and more are included in [Linux Bootstrap](https://github.com/joshukraine/linux-bootstrap).
 
 ### Installation
 
 ```sh
-git clone https://github.com/joshukraine/dotfiles.git ~/dotfiles
+git clone https://github.com/joshukraine/linux-dotfiles.git ~/dotfiles
 source ~/dotfiles/install.sh
 ```
 
@@ -37,19 +36,7 @@ source ~/dotfiles/install.sh
 
 After running `install.sh` there are still a couple of things that need to be done.
 
-* Set up iTerm 2 profile (see details below).
 * Add personal data to `~/.gitconfig.local` and `~/.zshrc.local`.
-
-
-### Setting up iTerm 2
-
-Thanks to a [great blog post](http://stratus3d.com/blog/2015/02/28/sync-iterm2-profile-with-dotfiles-repository/) by Trevor Brown, I learned that you can quickly set up iTerm 2 by exporting your profile. Here are the steps.
-
-1. Open iTerm 2.
-2. Select iTerm 2 > Preferences.
-3. Under the General tab, check the box labeled "Load preferences from a custom folder or URL:"
-4. Press "Browse" and point it to `~/dotfiles/iterm2/com.googlecode.iterm2.plist`.
-5. Restart iTerm 2.
 
 
 ### Some of my favorite dotfile repos
