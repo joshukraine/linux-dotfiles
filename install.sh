@@ -7,7 +7,7 @@
 ################################################################################
 
 
-fancy_echo() {
+dotfiles_echo() {
   local fmt="$1"; shift
 
   # shellcheck disable=SC2059
@@ -21,16 +21,16 @@ set -u # Prevent unset variables
 files="gemrc gitconfig gitignore_global hushlogin npmrc pryrc tmux.conf vimrc zshrc"
 DOTFILES_DIR=$HOME/dotfiles
 
-fancy_echo "Installing dotfiles..."
+dotfiles_echo "Installing dotfiles..."
 
 for file in $files; do
   if [ -f $HOME/.$file ]; then
-    fancy_echo ".$file already present. Backing up..."
+    dotfiles_echo ".$file already present. Backing up..."
     cp $HOME/.$file "$HOME/.${file}_backup"
     rm -f $HOME/.$file
   fi
-  fancy_echo "-> Linking $DOTFILES_DIR/$file to $HOME/.$file..."
+  dotfiles_echo "-> Linking $DOTFILES_DIR/$file to $HOME/.$file..."
   ln -nfs "$DOTFILES_DIR/$file" "$HOME/.$file"
 done
 
-fancy_echo "Dotfiles installation complete!"
+dotfiles_echo "Dotfiles installation complete!"
