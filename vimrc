@@ -150,7 +150,6 @@ let g:grep_cmd_opts = '--line-numbers --noheading'
 
 " }}}
 
-
 " Plugins {{{
 
 filetype off " required by Vundle
@@ -160,10 +159,9 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
 " Vundle itself
-Plugin 'gmarik/Vundle.vim'                " Vundle, the plug-in manager for Vim                   | https://github.com/gmarik/Vundle.vim
+Plugin 'VundleVim/Vundle.vim'             " Vundle, the plug-in manager for Vim                   | https://github.com/VundleVim/Vundle.vim.git
 
 " General Vim
-Plugin 'gcmt/wildfire.vim'                " Smart selection of the closest text object            | https://github.com/gcmt/wildfire.vim
 Plugin 'godlygeek/tabular'                " Vim script for text filtering and alignment           | https://github.com/godlygeek/tabular
 Plugin 'ervandew/supertab'                " Use <Tab> for all your insert completion needs        | https://github.com/ervandew/supertab
 Plugin 'tomtom/tcomment_vim'              " An extensible & universal comment vim-plugin          | https://github.com/tomtom/tcomment_vim
@@ -186,7 +184,8 @@ Plugin 'joshukraine/dragvisuals'          " Damian Conway's dragvisuals plugin f
 
 " Look and Feel
 Plugin 'altercation/vim-colors-solarized' " Precision colorscheme for the vim text editor         | https://github.com/altercation/vim-colors-solarized
-Plugin 'bling/vim-airline'                " Status/tabline for vim                                | https://github.com/bling/vim-airline
+Plugin 'vim-airline/vim-airline'          " Status/tabline for vim                                | https://github.com/vim-airline/vim-airline
+Plugin 'vim-airline/vim-airline-themes'   " A collection of themes for vim-airline                | https://github.com/vim-airline/vim-airline-themes
 
 " Tim Pope
 Plugin 'tpope/vim-endwise'                " Add 'end' keyword when needed                         | https://github.com/tpope/vim-endwise
@@ -195,7 +194,8 @@ Plugin 'tpope/vim-rails'                  " Ruby on Rails power tools           
 Plugin 'tpope/vim-obsession'              " Continuously updated session files                    | https://github.com/tpope/vim-obsession
 Plugin 'tpope/vim-rake'                   " Extended funtionality for rails.vim                   | https://github.com/tpope/vim-rake
 Plugin 'tpope/vim-bundler'                " Vim goodies for Bundler, rails.vim, rake.vim          | https://github.com/tpope/vim-bundler
-Plugin 'tpope/vim-ragtag'                 " HTML/XML tag mappings                                 | https://github.com/tpope/vim-ragtag
+Plugin 'tpope/vim-fugitive'               " Tim Pope's Git wrapper                                | https://github.com/tpope/vim-fugitive
+Plugin 'tpope/vim-haml'                   " Vim runtime files for Haml, Sass, and SCSS            | https://github.com/tpope/vim-haml
 
 " Related to testing & tmux
 Plugin 'thoughtbot/vim-rspec'             " Run Rspec specs from Vim                              | https://github.com/thoughtbot/vim-rspec
@@ -208,22 +208,19 @@ Plugin 'garbas/vim-snipmate'              " Textmate-style snippet behavior for 
 Plugin 'joshukraine/vim-snippets'         " My customized vim-snippets                            | https://github.com/joshukraine/vim-snippets
 
 " Other
+Plugin 'christoomey/vim-conflicted'       " Easy git merge conflict resolution in Vim             | https://github.com/christoomey/vim-conflicted
 Plugin 'kchmck/vim-coffee-script'         " CoffeeScript support for vim                          | https://github.com/kchmck/vim-coffee-script
 Plugin 'bronson/vim-trailing-whitespace'  " Highlights trailing whitespace in red                 | https://github.com/bronson/vim-trailing-whitespace
-Plugin 'duff/vim-scratch'                 " Create a temporary scratch buffer                     | https://github.com/duff/vim-scratch
 Plugin 'airblade/vim-gitgutter'           " Shows a git diff in the 'gutter'                      | https://github.com/airblade/vim-gitgutter
 Plugin 'mattn/webapi-vim'                 " Allow vim to interface with web APIs                  | https://github.com/mattn/webapi-vim
-Plugin 'mattn/gist-vim'                   " Post gists from vim                                   | https://github.com/mattn/gist-vim
 Plugin 'Glench/Vim-Jinja2-Syntax'         " An up-to-date jinja2 syntax file                      | https://github.com/Glench/Vim-Jinja2-Syntax
-Plugin 'xolox/vim-notes'
-Plugin 'xolox/vim-misc'
+Plugin 'jiangmiao/auto-pairs'             " Insert or delete brackets, parens, quotes in pair.    | https://github.com/jiangmiao/auto-pairs
 
 " All of your Plugins must be added before the following line
 call vundle#end()                         " required
 filetype plugin indent on                 " required
 
 " }}}
-
 
 " General Mappings {{{
 
@@ -240,14 +237,12 @@ map <leader>p :set paste<CR>o<esc>"*]p:set nopaste<CR> " Fix indentation on past
 map <leader>i mmgg=G`m<CR> " For indenting code
 map <leader>h :nohl<CR> " Clear highlights
 map <leader>s :%s/\s\+$//e<CR> " Manually clear trailing whitespace
-imap <C-[> <Esc>:w<CR> " Return to normal mode faster + write file
+inoremap <C-[> <Esc>:w<CR> " Return to normal mode faster + write file
 inoremap jj <C-c> " jj to switch back to normal mode
 nnoremap <leader><leader> <c-^> " Switch between the last two files
 map <C-t> <esc>:tabnew<CR> " Open a new tab with Ctrl+T
 map Q <Nop> " Disable Ex mode
 map K <Nop> " Disable K looking stuff up
-nmap <leader>O O<Esc> " Add new line ABOVE without leaving normal mode
-map <C-n> :vs note:<CR>
 
 " Delete all lines beginning with '#' regardless of leading space.
 map <leader>d :g/^\s*#.*/d<CR>:nohl<CR>
@@ -265,7 +260,6 @@ nnoremap / /\v
 
 " }}}
 
-
 " Plugin-specific Mappings and Settings {{{
 
 " NERDTree
@@ -273,6 +267,8 @@ nmap <silent> <F3> :NERDTreeToggle<CR>
 map <leader>\ :NERDTreeToggle<CR>
 let g:NERDTreeWinSize=25
 let NERDTreeShowHidden=1
+let g:NERDTreeDirArrowExpandable = '▸'
+let g:NERDTreeDirArrowCollapsible = '▾'
 
 " Toggle GitGutter
 nnoremap <F4> :GitGutterToggle<CR>
@@ -298,7 +294,7 @@ let g:VtrPercentage = 20
 let g:VtrUseVtrMaps = 1
 nnoremap <leader>sd :VtrSendCtrlD<cr>
 nmap <leader>fs :VtrFlushCommand<cr>:VtrSendCommandToRunner<cr>
-nmap <leader>osp :VtrOpenRunner {'orientation': 'v', 'percentage': 20, 'cmd': '' }<cr>
+nmap <leader>osp :VtrOpenRunner {'orientation': 'h', 'percentage': 20, 'cmd': '' }<cr>
 nmap <leader>orc :VtrOpenRunner {'orientation': 'h', 'percentage': 40, 'cmd': 'rc'}<cr>
 nmap <leader>opr :VtrOpenRunner {'orientation': 'h', 'percentage': 40, 'cmd': 'pry'}<cr>
 
@@ -313,7 +309,7 @@ let g:ctrlp_max_height = 15
 let g:ctrlp_arg_map = 1
 
 " CtrlP -> files matched are ignored when expanding wildcards
-set wildignore+=*/.git/*,*/.hg/*,*/.svn/*.,*/.DS_Store
+set wildignore+=*/.git/*,*.tmp/*,*/.hg/*,*/.svn/*.,*/.DS_Store
 
 " CtrlP -> directories to ignore when fuzzy finding
 let g:ctrlp_custom_ignore = '\v[\/]((build|node_modules)|\.(git|sass-cache))$'
@@ -328,14 +324,10 @@ command! RTfactories :tabe spec/factories.rb
 command! RSfactories :sp spec/factories.rb
 command! RVfactories :vs spec/factories.rb
 
-" Gist settings
-let g:github_user = $GITHUB_USER
-let g:github_token = $GITHUB_TOKEN
-let g:gist_detect_filetype = 1
-let g:gist_open_browser_after_post = 0
-let g:gist_post_private = 1
-let g:gist_show_privates = 1
-let g:gist_clip_command = 'pbcopy'
+" Syntastic
+let g:syntastic_scss_checkers = ['scss_lint']
+let g:syntastic_haml_checkers = ['haml_lint']
+let g:syntastic_javascript_checkers = ['eslint']
 
 " Key mappings for dragvisuals.vim
 runtime bundle/dragvisuals/plugins/dragvisuals.vim
@@ -349,16 +341,13 @@ vmap  <expr>  D        DVB_Duplicate()
 " Remove any introduced trailing whitespace after moving...
 let g:DVB_TrimWS = 1
 
-" Notes.vim
-let g:notes_directories = ['~/Dropbox/Notes']
-let g:notes_suffix = '.md'
 " }}}
-
 
 " Commands {{{
 
 " specify syntax highlighting for specific files
 autocmd Bufread,BufNewFile *.spv set filetype=php
+autocmd Bufread,BufNewFile aliases,functions,prompt,tmux,oh-my-zsh set filetype=zsh
 autocmd Bufread,BufNewFile *.md set filetype=markdown " Vim interprets .md as 'modula2' otherwise, see :set filetype?
 
 " When loading text files, wrap them and don't split up words.
@@ -368,7 +357,7 @@ au BufNewFile,BufRead *.txt setlocal nolist " Don't display whitespace
 " file formats
 autocmd Filetype gitcommit setlocal spell textwidth=72
 autocmd Filetype sh,markdown setlocal wrap linebreak nolist textwidth=0 wrapmargin=0 " http://vim.wikia.com/wiki/Word_wrap_without_line_breaks
-autocmd FileType sh,cucumber,ruby,yaml,html,zsh,vim,css,scss,javascript,gitconfig setlocal shiftwidth=2 tabstop=2 expandtab
+autocmd FileType sh,cucumber,ruby,yaml,html,xml,zsh,vim,css,scss,javascript,gitconfig setlocal shiftwidth=2 tabstop=2 expandtab
 
 " autoindent with two spaces, always expand tabs
 autocmd FileType ruby,eruby,yaml setlocal ai sw=2 sts=2 et
@@ -388,7 +377,7 @@ autocmd BufRead * normal zM
 " set foldnestmax=3
 
 " Close vim if only nerdtree window is left
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " Change colourscheme when diffing
 fun! SetDiffColors()
@@ -413,7 +402,6 @@ autocmd VimResized * :wincmd =
 
 " }}}
 
-
 " Airline (status line) {{{
 " https://github.com/bling/vim-airline
 
@@ -421,14 +409,80 @@ if !exists('g:airline_symbols')
   let g:airline_symbols = {}
 endif
 
-let g:airline_symbols.linenr = 'Ln'
 let g:airline_powerline_fonts=1
+
+let g:airline_symbols.branch = ''
+let g:airline_symbols.readonly = ''
+let g:airline_symbols.linenr = ''
+let g:airline_symbols.crypt = '🔒'
+
 let g:airline_left_sep=''
 let g:airline_right_sep=''
-" let g:airline_theme='powerlineish'
+let g:airline_left_sep = ''
+let g:airline_left_alt_sep = ''
+let g:airline_right_sep = ''
+let g:airline_right_alt_sep = ''
+
+" For more intricate customizations, you can replace the predefined sections
+" with the usual statusline syntax.
+"
+" Note: If you define any section variables it will replace the default values
+" entirely.  If you want to disable only certain parts of a section you can try
+" using variables defined in the |airline-configuration| or |airline-extensions|
+" section.
+" >
+"   variable names                default contents
+"   ----------------------------------------------------------------------------
+"   let g:airline_section_a       (mode, crypt, paste, iminsert)
+"   let g:airline_section_b       (hunks, branch)
+"   let g:airline_section_c       (bufferline or filename)
+"   let g:airline_section_gutter  (readonly, csv)
+"   let g:airline_section_x       (tagbar, filetype, virtualenv)
+"   let g:airline_section_y       (fileencoding, fileformat)
+"   let g:airline_section_z       (percentage, line number, column number)
+"   let g:airline_section_error   (ycm_error_count, syntastic, eclim)
+"   let g:airline_section_warning (ycm_warning_count, whitespace)
+
+  " here is an example of how you could replace the branch indicator with
+  " the current working directory, followed by the filename.
+  " let g:airline_section_b = '%{getcwd()}'
+  " let g:airline_section_c = '%t%m'
+
+let g:airline#extensions#default#section_truncate_width = {
+    \ 'y': 100,
+    \ }
+
+let g:airline#extensions#default#layout = [
+    \ [ 'a', 'b', 'c' ],
+    \ [ 'x', 'y', 'z', 'error', 'warning' ]
+    \ ]
+
+" airline branch settings
+" let g:airline#extensions#branch#enabled = 1
+" let g:airline#extensions#branch#displayed_head_limit = 10
+
+  " default value leaves the name unmodifed
+  " let g:airline#extensions#branch#format = 0
+
+  " to only show the tail, e.g. a branch 'feature/foo' becomes 'foo', use
+  " let g:airline#extensions#branch#format = 1
+
+  " to truncate all path sections but the last one, e.g. a branch
+  " 'foo/bar/baz' becomes 'f/b/baz', use
+  " let g:airline#extensions#branch#format = 2
+
+" airline hunk settings
+
+" enable/disable showing a summary of changed hunks under source control
+" let g:airline#extensions#hunks#enabled = 1
+
+" enable/disable showing only non-zero hunks
+let g:airline#extensions#hunks#non_zero_only = 1
+
+" set hunk count symbols
+" let g:airline#extensions#hunks#hunk_symbols = ['+', '~', '-']
 
 " }}}
-
 
 " Colorscheme {{{
 
@@ -440,7 +494,6 @@ highlight clear IncSearch
 highlight IncSearch term=reverse cterm=reverse ctermfg=7 ctermbg=0 guifg=Black guibg=Yellow
 highlight VertSplit ctermbg=NONE guibg=NONE
 " }}}
-
 
 " Include local settings {{{
 if filereadable(glob("$HOME/.vimrc.local"))
