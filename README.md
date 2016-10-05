@@ -1,8 +1,10 @@
-# My Dotfiles for Linux Desktop
+My Dotfiles for Linux Desktop
+=============================
 
 These are my dotfiles and general system preferences adapted for Debian-type Linux systems. This setup is intended for a personal development machine, not a web-facing server.
 
-### Linux Bootstrap Script
+Linux Bootstrap Script
+----------------------
 
 This repo previously contained my entire provisioning solution for a new machine running Linux. I've now extracted the provisioning functionality into its own repository. Check it out:
 
@@ -11,7 +13,8 @@ This repo previously contained my entire provisioning solution for a new machine
 NOTE: Linux Bootstrap automatically clones and installs this dotfiles repo.
 
 
-### Prerequisites
+Prerequisites
+-------------
 
 The dotfiles assume you are running Ubuntu 14.04 (or similar) with the following software preinstalled:
 
@@ -24,7 +27,8 @@ The dotfiles assume you are running Ubuntu 14.04 (or similar) with the following
 
 All of the above and more are included in [Linux Bootstrap](https://github.com/joshukraine/linux-bootstrap).
 
-### Installation
+Installation
+------------
 
 ```sh
 git clone https://github.com/joshukraine/linux-dotfiles.git ~/dotfiles
@@ -32,14 +36,16 @@ source ~/dotfiles/install.sh
 ```
 
 
-### Post-install Tasks
+Post-install Tasks
+------------------
 
 After running `install.sh` there are still a couple of things that need to be done.
 
 * Add personal data to `~/.gitconfig.local` and `~/.zshrc.local`.
 
 
-### Some of my favorite dotfile repos
+Some of my favorite dotfile repos
+---------------------------------
 
 * Pro Vim (https://github.com/Integralist/ProVim)
 * Trevor Brown (https://github.com/Stratus3D/dotfiles)
@@ -57,7 +63,8 @@ After running `install.sh` there are still a couple of things that need to be do
 * Paul Irish (https://github.com/paulirish/dotfiles)
 
 
-### Helpful web resources on dotfiles, et al.
+Helpful web resources on dotfiles, et al.
+-----------------------------------------
 
 * http://dotfiles.github.io/
 * https://medium.com/@webprolific/getting-started-with-dotfiles-43c3602fd789
