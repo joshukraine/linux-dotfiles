@@ -5,14 +5,13 @@ alias vv='vim --version | less'
 alias ct='ctags -R --languages=ruby --exclude=.git --exclude=log . $(bundle list --paths)'
 alias vi0='vim -u NONE'
 
-# Jump to quick edits
-alias ea='vim ~/dotfiles/zsh/aliases'
-alias ed='vim ~/dotfiles'
-alias ef='vim ~/dotfiles/zsh/functions'
-alias ep='vim ~/dotfiles/zsh/prompt'
-alias et='vim ~/.tmux.conf'
-alias ev='vim ~/.vimrc'
-alias ez='vim ~/.zshrc'
+alias ea='$EDITOR ~/dotfiles/zsh/aliases'
+alias ed='$EDITOR ~/dotfiles'
+alias ef='$EDITOR ~/dotfiles/zsh/functions'
+alias ep='$EDITOR ~/dotfiles/zsh/prompt'
+alias et='$EDITOR ~/.tmux.conf'
+alias ev='$EDITOR ~/.vimrc'
+alias ez='$EDITOR ~/.zshrc'
 
 # General UNIX
 alias mv='mv -iv'
@@ -20,10 +19,14 @@ alias cp='cp -iv'
 alias srm='srm -iv'
 alias df='df -h'
 alias du='du -h'
+alias dud='du -d 1 -h'
+alias duf='du -sh *'
 alias mkdir='mkdir -pv'
 alias src='source ~/.zshrc'
 alias pi='ping -Anc 5 8.8.8.8'
 alias path='echo -e ${PATH//:/\\n}'
+
+# Moving around
 alias ..='cd ..'
 alias ...='cd ../../'
 alias ....='cd ../../../'
@@ -32,12 +35,21 @@ alias .2='cd ../../'
 alias .3='cd ../../../'
 alias .4='cd ../../../../'
 alias .5='cd ../../../../..'
-alias lsa='ls -lahF'
-alias l='ls -lahF'
-alias ll='ls -lhF'
-alias la='ls -lAhF'
-alias lf='ls -F'
-alias lh='ls -d .*'
+
+# Listing files and directories
+alias l='ls -lFh'     #size,show type,human readable
+alias la='ls -lAFh'   #long list,show almost all,show type,human readable
+alias lr='ls -tRFh'   #sorted by date,recursive,show type,human readable
+alias lt='ls -ltFh'   #long list,sorted by date,show type,human readable
+alias ll='ls -l'      #long list
+alias ldot='ls -ld .*'
+alias lS='ls -1FSsh'
+alias lart='ls -1Fcart'
+alias lrt='ls -1Fcrt'
+
+# Finding stuff!
+alias fd='find . -type d -name'
+alias ff='find . -type f -name'
 
 # Tree
 alias t1='tree -CFL 1'
@@ -58,11 +70,20 @@ alias bx='bundle exec'
 alias sst='spring status'
 
 # Middleman
-alias mss='bundle exec middleman server'
-alias msg='bundle exec middleman server -e gulp'
-alias mcc='bundle exec middleman console'
-alias mbb='bundle exec middleman build --clean'
-#
+alias mm='bundle exec middleman'
+alias mms='bundle exec middleman server'
+alias mmc='bundle exec middleman console -e console'
+alias mmb='bundle exec middleman build --clean'
+
+# npm (borrowed from Oh-My-Zsh npm plugin)
+alias npmG='npm install --global'
+alias npmS='npm install --save'
+alias npmD='npm install --save-dev'
+alias npmO='npm outdated'
+alias npmV='npm -v'
+alias npmL='npm list --depth=0'
+alias npmLg='npm list --depth=0 -g'
+
 # Copy/paste
 alias pbcopy='xclip -selection clipboard'
 alias pbpaste='xclip -selection clipboard -o'
