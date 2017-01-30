@@ -140,8 +140,8 @@ alias pbpaste='xclip -selection clipboard -o'
 
 # Postgres
 # Need to look into systemd commands for start/stop
-# alias startpost='sudo /etc/init.d/postgresql start'
-# alias stoppost='sudo /etc/init.d/postgresql stop'
+alias startpost='sudo systemctl start postgresql.service'
+alias stoppost='sudo systemctl stop postgresql.service'
 alias statpost='ps aux | grep postgres'
 
 # rbenv
