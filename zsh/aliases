@@ -5,6 +5,7 @@ alias vv='vim --version | less'
 alias ct='ctags -R --languages=ruby --exclude=.git --exclude=log . $(bundle list --paths)'
 alias vi0='vim -u NONE'
 
+# Jump to quick edits
 alias ea='$EDITOR ~/dotfiles/zsh/aliases'
 alias ed='$EDITOR ~/dotfiles'
 alias ef='$EDITOR ~/dotfiles/zsh/functions'
@@ -46,21 +47,70 @@ alias ldot='ls -ld .*'
 alias lS='ls -1FSsh'
 alias lart='ls -1Fcart'
 alias lrt='ls -1Fcrt'
+alias ld='ls -ld' # Useful for showing permissions of a single directory
 
 # Finding stuff!
 alias fd='find . -type d -name'
 alias ff='find . -type f -name'
 
 # Tree
-alias t1='tree -CFL 1'
-alias t2='tree -CFL 2'
-alias t3='tree -CFL 3'
-alias t4='tree -CFL 4'
+alias tree='tree -CF'
+alias t1='tree -L 1'
+alias t2='tree -L 2'
+alias t3='tree -L 3'
+alias t4='tree -L 4'
 
-alias t1a='tree -CFLa 1'
-alias t2a='tree -CFLa 2'
-alias t3a='tree -CFLa 3'
-alias t4a='tree -CFLa 4'
+alias t1a='tree -La 1'
+alias t2a='tree -La 2'
+alias t3a='tree -La 3'
+alias t4a='tree -La 4'
+
+# Git (Mostly equivalent to ~/.gitconfig aliases)
+alias ga='git add'
+alias gaa='git add --all'
+alias gap='git add --patch'
+
+alias gb='git branch'
+alias gba='git branch --all'
+alias gbr='git branch --remote'
+
+alias gca='git commit --amend'
+alias gci='git commit -v'
+alias gco='git checkout'
+alias gcm='git checkout master'
+alias gcl='git clone'
+
+alias gdc='git diff --word-diff --cached --color-words'
+alias gdf='git diff --word-diff --color-words'
+alias gdfs='git diff --staged'
+
+alias gf='git fetch'
+
+alias gl='git log --oneline --decorate --color --graph'
+alias gla='git log --oneline --decorate --color --graph --all'
+alias glo='git log --oneline --decorate --color'
+alias glg='git log --stat --color'
+alias glgg='git log --graph --color'
+alias glga='git log --graph --decorate --all'
+alias glgm='git log --graph --max-count=10'
+alias glgp='git log --stat --color --patch'
+alias glol='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
+alias gloa='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit --all'
+
+alias gmup='!git checkout master && git pull && git checkout -'
+
+alias gpl='git pull'
+alias gps='git push'
+alias gpum='git push -u origin master'
+
+alias grv='git remote -v'
+
+alias gs='git status --short --branch'
+alias gst='git status'
+
+alias gtl='git tag --list | sort -r'
+
+alias gwip='git add -A; git rm $(git ls-files --deleted) 2> /dev/null; git commit --no-verify -m "--wip--"'
 
 # Upgrade Oh My Zshell
 alias upz='upgrade_oh_my_zsh'
@@ -89,13 +139,19 @@ alias pbcopy='xclip -selection clipboard'
 alias pbpaste='xclip -selection clipboard -o'
 
 # Postgres
-alias startpost='sudo /etc/init.d/postgresql start'
-alias stoppost='sudo /etc/init.d/postgresql stop'
+# Need to look into systemd commands for start/stop
+# alias startpost='sudo /etc/init.d/postgresql start'
+# alias stoppost='sudo /etc/init.d/postgresql stop'
 alias statpost='ps aux | grep postgres'
 
 # rbenv
 alias rbv='rbenv versions'
 alias rbl='rbenv install -l | ag "^\s+[0-9].*" --nocolor'
 
+# Ansible
+alias ans='ansible'
+alias ap='ansible-playbook'
+
 # Misc
 alias color='colortest -w -s'
+alias hangout='open https://hangouts.google.com/hangouts/_'
