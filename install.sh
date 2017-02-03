@@ -24,10 +24,10 @@ DOTFILES_DIR=$HOME/dotfiles
 dotfiles_echo "Installing dotfiles..."
 
 for file in $files; do
-  if [ -f $HOME/.$file ]; then
+  if [ -f "$HOME/.$file" ]; then
     dotfiles_echo ".$file already present. Backing up..."
-    cp $HOME/.$file "$HOME/.${file}_backup"
-    rm -f $HOME/.$file
+    cp "$HOME/.$file" "$HOME/.${file}_backup"
+    rm -f "$HOME/.$file"
   fi
   dotfiles_echo "-> Linking $DOTFILES_DIR/$file to $HOME/.$file..."
   ln -nfs "$DOTFILES_DIR/$file" "$HOME/.$file"
