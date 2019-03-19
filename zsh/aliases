@@ -1,31 +1,15 @@
-# Vim specific
-alias vi='vim'
-alias vir='vim -R'
-alias vv='vim --version | less'
-alias ct='ctags -R --languages=ruby --exclude=.git --exclude=log . $(bundle list --paths)'
-alias vi0='vim -u NONE'
-
-# Jump to quick edits
-alias ea='$EDITOR ~/dotfiles/zsh/aliases'
-alias ed='$EDITOR ~/dotfiles'
-alias ef='$EDITOR ~/dotfiles/zsh/functions'
-alias ep='$EDITOR ~/dotfiles/zsh/prompt'
-alias et='$EDITOR ~/.tmux.conf'
-alias ev='$EDITOR ~/.vimrc'
-alias ez='$EDITOR ~/.zshrc'
-
 # General UNIX
-alias mv='mv -iv'
 alias cp='cp -iv'
-alias srm='srm -iv'
 alias df='df -h'
 alias du='du -h'
 alias dud='du -d 1 -h'
 alias duf='du -sh *'
 alias mkdir='mkdir -pv'
-alias src='source ~/.zshrc'
-alias pi='ping -Anc 5 8.8.8.8'
+alias mv='mv -iv'
 alias path='echo -e ${PATH//:/\\n}'
+alias pi='ping -Anc 5 1.1.1.1'
+alias src='. ~/.zshrc'
+alias srm='srm -iv'
 
 # Moving around
 alias ..='cd ..'
@@ -39,84 +23,101 @@ alias .5='cd ../../../../..'
 
 # Listing files and directories
 alias l='ls -lFh'     #size,show type,human readable
-alias la='ls -lAFh'   #long list,show almost all,show type,human readable
-alias lr='ls -tRFh'   #sorted by date,recursive,show type,human readable
-alias lt='ls -ltFh'   #long list,sorted by date,show type,human readable
-alias ll='ls -l'      #long list
-alias ldot='ls -ld .*'
 alias lS='ls -1FSsh'
+alias la='ls -lAFh'   #long list,show almost all,show type,human readable
 alias lart='ls -1Fcart'
-alias lrt='ls -1Fcrt'
 alias ld='ls -ld' # Useful for showing permissions of a single directory
+alias ldot='ls -ld .*'
+alias ll='ls -l'      #long list
+alias lr='ls -tRFh'   #sorted by date,recursive,show type,human readable
+alias lrt='ls -1Fcrt'
+alias lt='ls -ltFh'   #long list,sorted by date,show type,human readable
 
 # Finding stuff!
 alias fd='find . -type d -name'
 alias ff='find . -type f -name'
 
+# Jump to quick edits
+alias ea='$EDITOR ~/dotfiles/zsh/aliases'
+alias ed='$EDITOR ~/dotfiles'
+alias ef='$EDITOR ~/dotfiles/zsh/functions'
+alias ep='$EDITOR ~/dotfiles/zsh/prompt'
+alias et='$EDITOR ~/.tmux.conf'
+alias ev='$EDITOR ~/.vimrc'
+alias evl='$EDITOR ~/.vimrc.local'
+alias ez='$EDITOR ~/.zshrc'
+alias ezl='$EDITOR ~/.zshrc.local'
+
 # Tree
-alias tree='tree -CF'
 alias t1='tree -L 1'
-alias t2='tree -L 2'
-alias t3='tree -L 3'
-alias t4='tree -L 4'
-
 alias t1a='tree -La 1'
+alias t2='tree -L 2'
 alias t2a='tree -La 2'
+alias t3='tree -L 3'
 alias t3a='tree -La 3'
+alias t4='tree -L 4'
 alias t4a='tree -La 4'
+alias tree='tree -CF'
 
-# Git (Mostly equivalent to ~/.gitconfig aliases)
+# Vim/Neovim
+alias vi='nvim'
+alias nv='nvim'
+alias vir='vim -R'
+alias vv='vim --version | less'
+alias vi0='vim -u NONE'
+
+# Git
 alias ga='git add'
 alias gaa='git add --all'
 alias gap='git add --patch'
-
 alias gb='git branch'
 alias gba='git branch --all'
 alias gbr='git branch --remote'
-
+alias gbrm='git branch --merged master | grep -v "^\*\|  master" | xargs -n 1 git branch -d'
 alias gca='git commit --amend'
 alias gci='git commit -v'
-alias gco='git checkout'
-alias gcm='git checkout master'
 alias gcl='git clone'
-
-alias gdc='git diff --word-diff --cached --color-words'
+alias gco='git checkout'
+alias gcom='git checkout master'
 alias gdf='git diff --word-diff --color-words'
-alias gdfs='git diff --staged'
-
+alias gds='git diff --word-diff --cached --color-words'
 alias gf='git fetch'
-
-alias gl='git log --oneline --decorate --color --graph'
-alias gla='git log --oneline --decorate --color --graph --all'
-alias glo='git log --oneline --decorate --color'
-alias glg='git log --stat --color'
-alias glgg='git log --graph --color'
-alias glga='git log --graph --decorate --all'
-alias glgm='git log --graph --max-count=10'
-alias glgp='git log --stat --color --patch'
-alias glol='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
-alias gloa='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit --all'
-
-alias gmup='!git checkout master && git pull && git checkout -'
-
+alias gl='git log --date=format:"%b %d, %Y" --pretty=format:"%C(yellow bold)%h%Creset%C(white)%d%Creset %s%n %C(blue)%aN (%cd)%n"'
+alias glg='git log --graph --stat --pretty=format:"%C(yellow bold)%h%Creset%C(white)%d%Creset %s%n %C(blue)%aN (%cd)%n"'
 alias gpl='git pull'
 alias gps='git push'
+alias gpsf='git push --force-with-lease'
 alias gpum='git push -u origin master'
-
 alias grv='git remote -v'
-
-alias gs='git status --short --branch'
-alias gst='git status'
-
+alias gs='git status'
 alias gtl='git tag --list | sort -r'
-
 alias gwip='git add -A; git rm $(git ls-files --deleted) 2> /dev/null; git commit --no-verify -m "--wip--"'
 
-# Upgrade Oh My Zshell
-alias upz='upgrade_oh_my_zsh'
-
-# Rails (more are defined in the oh-my-zsh rails plugin)
+# Rails
+alias -g RED='RAILS_ENV=development'
+alias -g REP='RAILS_ENV=production'
+alias -g RET='RAILS_ENV=test'
 alias bx='bundle exec'
+alias crsp='spring stop && COVERAGE=true bin/rake spec'
+alias fos='foreman start'
+alias hl='haml-lint'
+alias mina='_mina_command'
+alias om='overmind start'
+alias psp='spring stop && DISABLE_SPRING=0 bin/rake parallel:spec'
+alias rails='_rails_command'
+alias rc='rails console'
+alias rcop='rubocop'
+alias rdb='rails dbconsole'
+alias rddd='brew services restart postgresql; sleep 15; rails db:drop'
+alias rdm='rails db:migrate'
+alias rgm='rails generate migration'
+alias rs='rails server'
+alias rsp='rspec .'
+alias rspec='_rspec_command'
+alias rsr='rails restart'
+alias rtp='rails db:test:prepare'
+alias spring='_spring_command'
+alias sps='spring stop'
 alias sst='spring status'
 
 # Middleman
@@ -124,34 +125,29 @@ alias mm='bundle exec middleman'
 alias mms='bundle exec middleman server'
 alias mmc='bundle exec middleman console -e console'
 alias mmb='bundle exec middleman build --clean'
+alias mma='bundle exec middleman article'
 
-# npm (borrowed from Oh-My-Zsh npm plugin)
-alias npmG='npm install --global'
-alias npmS='npm install --save'
-alias npmD='npm install --save-dev'
-alias npmO='npm outdated'
-alias npmV='npm -v'
-alias npmL='npm list --depth=0'
-alias npmLg='npm list --depth=0 -g'
+# Postgres
+alias startpost='sudo systemctl start postgresql.service'
+alias stoppost='sudo systemctl stop postgresql.service'
+alias statpost='ps aux | grep postgres'
+
+# Ansible
+alias ans='ansible'
+alias anp='ansible-playbook'
+alias anv='ansible-vault --ask-vault-pass'
+
+# asdf
+alias aua='asdf update && asdf plugin-update --all'
+alias ala='asdf list-all'
+
+# oh-my-zsh
+alias upz='upgrade_oh_my_zsh'
 
 # Copy/paste
 alias pbcopy='xclip -selection clipboard'
 alias pbpaste='xclip -selection clipboard -o'
 
-# Postgres
-# Need to look into systemd commands for start/stop
-alias startpost='sudo systemctl start postgresql.service'
-alias stoppost='sudo systemctl stop postgresql.service'
-alias statpost='ps aux | grep postgres'
-
-# rbenv
-alias rbv='rbenv versions'
-alias rbl='rbenv install -l | ag "^\s+[0-9].*" --nocolor'
-
-# Ansible
-alias ans='ansible'
-alias ap='ansible-playbook'
-
 # Misc
+alias ct='ctags -R --languages=ruby --exclude=.git --exclude=log . $(bundle list --paths)'
 alias color='colortest -w -s'
-alias hangout='open https://hangouts.google.com/hangouts/_'
