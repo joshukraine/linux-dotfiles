@@ -1,7 +1,8 @@
 " Settings {{{
 
-" Switch syntax highlighting on, when the terminal has colors
-syntax on
+" Force vim to use older regex engine.
+" https://stackoverflow.com/a/16920294/655204
+set re=1
 
 " Use vim, not vi api
 set nocompatible
@@ -15,17 +16,8 @@ set nowritebackup
 " No swap file
 set noswapfile
 
-" Command history
-set history=500
-
-" Always show cursor
-set ruler
-
 " Show incomplete commands
 set showcmd
-
-" Incremental searching (search as you type)
-set incsearch
 
 " Highlight search matches
 set hlsearch
@@ -46,11 +38,14 @@ set hidden
 " Turn word wrap off
 set nowrap
 
-" Allow backspace to delete end of line, indent and start of line characters
-set backspace=indent,eol,start
+" Don't break long lines in insert mode.
+set formatoptions=l
+
+" Conceal Markdown characters
+set conceallevel=2
 
 " Convert tabs to spaces, all file types
-" set expandtab
+set expandtab
 
 " Set tab size in spaces (this is for manual indenting)
 set tabstop=2
@@ -62,24 +57,14 @@ set shiftwidth=2
 set number
 set relativenumber
 
-" Highlight tailing whitespace
+" Highlight tabs and trailing whitespace
 set list listchars=tab:»·,trail:·
-
-" Get rid of the delay when pressing O (for example)
-" http://stackoverflow.com/questions/2158516/vim-delay-before-o-opens-a-new-line
-set timeout timeoutlen=1000 ttimeoutlen=100
-
-" Always show status bar
-set laststatus=2
 
 " Hide the toolbar
 set guioptions-=T
 
 " UTF encoding
 set encoding=utf-8
-
-" Autoload files that have changed outside of vim
-set autoread
 
 " Use system clipboard
 " http://stackoverflow.com/questions/8134647/copy-and-paste-in-vim-via-keyboard-between-different-mac-terminals
@@ -99,11 +84,11 @@ set cursorcolumn
 " Ensure Vim doesn't beep at you every time you make a mistype
 set visualbell
 
-" Visual autocomplete for command menu (e.g. :e ~/path/to/file)
-set wildmenu
-
 " redraw only when we need to (i.e. don't redraw when executing a macro)
 set lazyredraw
+
+" Indicates a fast terminal connection
+set ttyfast
 
 " highlight a matching [{()}] when cursor is placed on start/end character
 set showmatch
@@ -120,11 +105,7 @@ set scrolloff=3
 " Set the terminal's title
 set title
 
-set autoindent
-
 set tags=./tags;
-
-set t_Co=256
 
 set fillchars+=vert:\|
 
@@ -132,11 +113,8 @@ set fillchars+=vert:\|
 set textwidth=80
 set colorcolumn=+1
 
-" Keep focus split large, others minimal
-set winwidth=90
-set winheight=7
-set winminheight=7
-set winheight=999
+" Start diff mode with vertical splits
+set diffopt=vertical
 
 " Set built-in file system explorer to use layout similar to the NERDTree plugin
 let g:netrw_liststyle=3
@@ -146,103 +124,130 @@ runtime macros/matchit.vim
 
 set grepprg=ag
 
-let g:grep_cmd_opts = '--line-numbers --noheading'
+let g:grep_cmd_opts = '--line-numbers --noheading --ignore-dir=log --ignore-dir=tmp'
 
+if has('nvim')
+  set inccommand=nosplit
+
+  set updatetime=100
+
+  set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
+        \,a:blinkwait0-blinkoff400-blinkon250-Cursor/lCursor
+        \,sm:block-blinkwait0-blinkoff150-blinkon175
+endif
+
+" Need this when using material colorscheme
+" if (has("termguicolors"))
+"   set termguicolors
+" endif
+
+" Keep focus split wide, others narrow.
+set winwidth=90
+set winminwidth=5
+
+" Keep focus split at max height, others minimal.
+function! SetWindowHeight()
+  set winheight=7
+  set winminheight=7
+  set winheight=999
+endfunction
+
+" Reset window height to avoid session errors.
+function! ResetWindowHeight()
+  set winminheight=0
+  set winheight=1
+endfunction
+
+" Requires 'jq' (brew install jq)
+function! s:PrettyJSON()
+  %!jq .
+  set filetype=json
+  normal zR
+endfunction
+command! PrettyJSON :call <sid>PrettyJSON()
 " }}}
 
-" Plugins {{{
+" Commands {{{
 
-filetype off " required by Vundle
+" specify syntax highlighting for specific files
+augroup file_types
+  autocmd!
+  autocmd Bufread,BufNewFile *.spv set filetype=php
+  autocmd Bufread,BufNewFile *Brewfile,pryrc set filetype=ruby
+  autocmd Bufread,BufNewFile *stylelintrc,*browserslistrc,*babelrc set filetype=json
+  autocmd Bufread,BufNewFile aliases,functions,prompt,tmux,oh-my-zsh,opts set filetype=zsh
+  autocmd Bufread,BufNewFile *.md set filetype=markdown " Vim interprets .md as 'modula2' otherwise, see :set filetype?
+  autocmd Bufread,BufNewFile gitconfig set filetype=gitconfig
+augroup END
 
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
+" Remove trailing whitespace on save for specified file types.
+augroup clear_whitespace
+  autocmd!
+  au BufWritePre *.rb,*.yml,*.erb,*.haml,*.css,*.scss,*.js,*.coffee,*.vue :%s/\s\+$//e
+augroup END
 
-" Vundle itself
-Plugin 'VundleVim/Vundle.vim'             " Vundle, the plug-in manager for Vim                   | https://github.com/VundleVim/Vundle.vim.git
+" Fold settings
+augroup fold_settings
+  autocmd!
+  autocmd FileType json setlocal foldmethod=syntax
+  autocmd FileType json normal zR
+augroup END
 
-" General Vim
-Plugin 'godlygeek/tabular'                " Vim script for text filtering and alignment           | https://github.com/godlygeek/tabular
-Plugin 'ervandew/supertab'                " Use <Tab> for all your insert completion needs        | https://github.com/ervandew/supertab
-Plugin 'tomtom/tcomment_vim'              " An extensible & universal comment vim-plugin          | https://github.com/tomtom/tcomment_vim
-Plugin 'vim-scripts/BufOnly.vim'          " Delete all the buffers except current/named buffer    | https://github.com/vim-scripts/BufOnly.vim
-Plugin 'jlanzarotta/bufexplorer'          " Open/close/navigate vim's buffers                     | https://github.com/jlanzarotta/bufexplorer
+" Close vim if only nerdtree window is left
+augroup nerdtree_settings
+  autocmd!
+  autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+augroup END
 
-" Ruby-specific
-Plugin 'vim-ruby/vim-ruby'                " Vim/Ruby Configuration Files                          | https://github.com/vim-ruby/vim-ruby
-Plugin 'kana/vim-textobj-user'            " Create your own text objects                          | https://github.com/kana/vim-textobj-user
-Plugin 'nelstrom/vim-textobj-rubyblock'   " A custom text object for selecting ruby blocks        | https://github.com/nelstrom/vim-textobj-rubyblock
-Plugin 'scrooloose/syntastic'             " Syntax checking hacks for vim                         | https://github.com/scrooloose/syntastic
+" Unmap various plugin-related commands I don't use.
+augroup unmappings
+  autocmd!
+  " Unmap Bufexplorer leaders that I don't use. This avoids delays for other leaders.
+  autocmd VimEnter * nunmap <leader>bs
+  autocmd VimEnter * nunmap <leader>bv
+augroup END
 
-" Searching and Navigation
-Plugin 'scrooloose/nerdtree'              " A tree explorer plugin for vim                        | https://github.com/scrooloose/nerdtree
-Plugin 'skwp/greplace.vim'                " Global search and replace for vi                      | https://github.com/skwp/greplace.vim
-Plugin 'rking/ag.vim'                     " Vim plugin for the_silver_searcher                    | https://github.com/rking/ag.vim
-Plugin 'christoomey/vim-tmux-navigator'   " Seamless navigation between tmux panes and vim splits | https://github.com/christoomey/vim-tmux-navigator
-Plugin 'ctrlpvim/ctrlp.vim'               " Active fork of kien/ctrlp.vim—Fuzzy file finder       | https://github.com/ctrlpvim/ctrlp.vim
-Plugin 'joshukraine/dragvisuals'          " Damian Conway's dragvisuals plugin for vim            | https://github.com/joshukraine/dragvisuals
+" automatically rebalance windows on vim resize
+augroup window_resize
+  autocmd!
+  autocmd VimResized * :wincmd =
+augroup END
 
-" Look and Feel
-Plugin 'altercation/vim-colors-solarized' " Precision colorscheme for the vim text editor         | https://github.com/altercation/vim-colors-solarized
-Plugin 'vim-airline/vim-airline'          " Status/tabline for vim                                | https://github.com/vim-airline/vim-airline
-Plugin 'vim-airline/vim-airline-themes'   " A collection of themes for vim-airline                | https://github.com/vim-airline/vim-airline-themes
-
-" Tim Pope
-Plugin 'tpope/vim-endwise'                " Add 'end' keyword when needed                         | https://github.com/tpope/vim-endwise
-Plugin 'tpope/vim-surround'               " Quoting/parenthesizing made simple                    | https://github.com/tpope/vim-surround
-Plugin 'tpope/vim-rails'                  " Ruby on Rails power tools                             | https://github.com/tpope/vim-rails
-Plugin 'tpope/vim-obsession'              " Continuously updated session files                    | https://github.com/tpope/vim-obsession
-Plugin 'tpope/vim-rake'                   " Extended funtionality for rails.vim                   | https://github.com/tpope/vim-rake
-Plugin 'tpope/vim-bundler'                " Vim goodies for Bundler, rails.vim, rake.vim          | https://github.com/tpope/vim-bundler
-Plugin 'tpope/vim-fugitive'               " Tim Pope's Git wrapper                                | https://github.com/tpope/vim-fugitive
-Plugin 'tpope/vim-haml'                   " Vim runtime files for Haml, Sass, and SCSS            | https://github.com/tpope/vim-haml
-
-" Related to testing & tmux
-Plugin 'thoughtbot/vim-rspec'             " Run Rspec specs from Vim                              | https://github.com/thoughtbot/vim-rspec
-Plugin 'christoomey/vim-tmux-runner'      " Command runner for sending commands from vim to tmux. | https://github.com/christoomey/vim-tmux-runner
-
-" Related to vim-snipmate
-Plugin 'MarcWeber/vim-addon-mw-utils'     " [vim-snipmate dependency]                             | https://github.com/MarcWeber/vim-addon-mw-utils
-Plugin 'tomtom/tlib_vim'                  " [vim-snipmate dependency]                             | https://github.com/tomtom/tlib_vim
-Plugin 'garbas/vim-snipmate'              " Textmate-style snippet behavior for vim               | https://github.com/garbas/vim-snipmate
-Plugin 'joshukraine/vim-snippets'         " My customized vim-snippets                            | https://github.com/joshukraine/vim-snippets
-
-" Other
-Plugin 'christoomey/vim-conflicted'       " Easy git merge conflict resolution in Vim             | https://github.com/christoomey/vim-conflicted
-Plugin 'kchmck/vim-coffee-script'         " CoffeeScript support for vim                          | https://github.com/kchmck/vim-coffee-script
-Plugin 'bronson/vim-trailing-whitespace'  " Highlights trailing whitespace in red                 | https://github.com/bronson/vim-trailing-whitespace
-Plugin 'airblade/vim-gitgutter'           " Shows a git diff in the 'gutter'                      | https://github.com/airblade/vim-gitgutter
-Plugin 'mattn/webapi-vim'                 " Allow vim to interface with web APIs                  | https://github.com/mattn/webapi-vim
-Plugin 'Glench/Vim-Jinja2-Syntax'         " An up-to-date jinja2 syntax file                      | https://github.com/Glench/Vim-Jinja2-Syntax
-Plugin 'jiangmiao/auto-pairs'             " Insert or delete brackets, parens, quotes in pair.    | https://github.com/jiangmiao/auto-pairs
-
-" All of your Plugins must be added before the following line
-call vundle#end()                         " required
-filetype plugin indent on                 " required
-
+" Reset window sizes to avoid errors on session load.
+augroup set_window_height
+  autocmd!
+  autocmd VimLeavePre * :call ResetWindowHeight()
+  autocmd VimEnter * :call SetWindowHeight()
+augroup END
 " }}}
 
-" General Mappings {{{
+" Mappings {{{
 
 let mapleader = "\<Space>"
 
 " Misc
 map <leader>ev :tabe ~/.vimrc<CR>
-map <leader>r :source ~/.vimrc<CR>:AirlineRefresh<CR>
+map <leader>ew :windo edit!<CR>
+map <leader>eb :bufdo edit!<CR>
+map <leader>r :source ~/.vimrc<CR>
 map <leader>q :q<CR>
 map <leader>w :w<CR>
 map <leader>x :x<CR>
 map <leader>ra :%s/
-map <leader>p :set paste<CR>o<esc>"*]p:set nopaste<CR> " Fix indentation on paste
+map <leader>p :set paste<CR>""p:set nopaste<CR> " Fix indentation on paste
 map <leader>i mmgg=G`m<CR> " For indenting code
 map <leader>h :nohl<CR> " Clear highlights
+map <leader>0 :call SetWindowHeight()<CR>
 map <leader>s :%s/\s\+$//e<CR> " Manually clear trailing whitespace
 inoremap <C-[> <Esc>:w<CR> " Return to normal mode faster + write file
 inoremap jj <C-c> " jj to switch back to normal mode
-nnoremap <leader><leader> <c-^> " Switch between the last two files
+nnoremap <leader>4 <c-^> " Switch between the last two files
 map <C-t> <esc>:tabnew<CR> " Open a new tab with Ctrl+T
 map Q <Nop> " Disable Ex mode
 map K <Nop> " Disable K looking stuff up
+
+" Expand active file directory
+cnoremap <expr> %%  getcmdtype() == ':' ? expand('%:h').'/' : '%%'
 
 " Delete all lines beginning with '#' regardless of leading space.
 map <leader>d :g/^\s*#.*/d<CR>:nohl<CR>
@@ -255,23 +260,136 @@ nnoremap <leader>- :wincmd _<cr>:wincmd \|<cr>
 " zoom back out
 nnoremap <leader>= :wincmd =<cr>
 
-" Force vim to use 'very magic' mode for regex searches
-nnoremap / /\v
-
+" Write files as sudo
+cmap w!! w !sudo tee >/dev/null %
 " }}}
 
-" Plugin-specific Mappings and Settings {{{
+" Plugins {{{
+
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $HOME/.vimrc
+endif
+
+call plug#begin('~/.vim/plugged')
+
+" General
+Plug 'godlygeek/tabular'                " Vim script for text filtering and alignment           | https://github.com/godlygeek/tabular
+Plug 'tomtom/tcomment_vim'              " An extensible & universal comment vim-plugin          | https://github.com/tomtom/tcomment_vim
+Plug 'vim-scripts/BufOnly.vim'          " Delete all the buffers except current/named buffer    | https://github.com/vim-scripts/BufOnly.vim
+Plug 'jlanzarotta/bufexplorer'          " Open/close/navigate vim's buffers                     | https://github.com/jlanzarotta/bufexplorer
+Plug 'majutsushi/tagbar'                " A class outline viewer for vim                        | https://github.com/majutsushi/tagbar
+Plug 'w0rp/ale'                         " Asynchronous Lint Engine                              | https://github.com/w0rp/ale
+Plug 'ntpeters/vim-better-whitespace'   " Better whitespace highlighting for                    | https://github.com/ntpeters/vim-better-whitespace
+Plug 'jiangmiao/auto-pairs'             " Insert or delete brackets, parens, quotes in pair.    | https://github.com/jiangmiao/auto-pairs
+Plug 'airblade/vim-gitgutter'           " Shows a git diff in the 'gutter'                      | https://github.com/airblade/vim-gitgutter
+Plug 'machakann/vim-highlightedyank'    " Make the yanked region apparent!                      | https://github.com/machakann/vim-highlightedyank
+Plug 'diepm/vim-rest-console'           " A REST console for Vim.                               | https://github.com/diepm/vim-rest-console
+
+" Code Completion
+if has('nvim')
+  Plug 'Shougo/deoplete.nvim',
+  \ { 'do': ':UpdateRemotePlugins' }    " Asynchronous completion framework for neovim/Vim8     | https://github.com/Shougo/deoplete.nvim
+else
+  Plug 'Shougo/deoplete.nvim'
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
+endif
+" For snippet reference, see honza/vim-snippets at https://github.com/honza/vim-snippets
+Plug 'SirVer/ultisnips'                 " The ultimate snippet solution for Vim                 | https://github.com/sirver/UltiSnips
+Plug 'othree/csscomplete.vim'           " CSS Omni Complete Function for CSS3                   | https://github.com/othree/csscomplete.vim
+
+" Ruby-specific
+Plug 'vim-ruby/vim-ruby'                " Vim/Ruby Configuration Files                          | https://github.com/vim-ruby/vim-ruby
+Plug 'kana/vim-textobj-user'            " Create your own text objects                          | https://github.com/kana/vim-textobj-user
+Plug 'nelstrom/vim-textobj-rubyblock'   " A custom text object for selecting ruby blocks        | https://github.com/nelstrom/vim-textobj-rubyblock
+
+" Searching and Navigation
+Plug 'ctrlpvim/ctrlp.vim'               " Active fork of kien/ctrlp.vim—Fuzzy file finder       | https://github.com/ctrlpvim/ctrlp.vim
+Plug 'scrooloose/nerdtree'              " A tree explorer plugin for vim                        | https://github.com/scrooloose/nerdtree
+Plug 'brooth/far.vim'                   " Find And Replace Vim plugin                           | https://github.com/brooth/far.vim
+Plug 'skwp/greplace.vim'                " Global search and replace for VI                      | https://github.com/skwp/greplace.vim
+Plug 'mileszs/ack.vim'                  " Vim plugin for the Perl module / CLI script 'ack'     | https://github.com/mileszs/ack.vim
+Plug 'christoomey/vim-tmux-navigator'   " Seamless navigation between tmux panes and vim splits | https://github.com/christoomey/vim-tmux-navigator
+Plug 'joshukraine/dragvisuals'          " Damian Conway's dragvisuals plugin for vim            | https://github.com/joshukraine/dragvisuals
+Plug 'easymotion/vim-easymotion'        " Vim motions on speed!                                 | https://github.com/easymotion/vim-easymotion
+
+" Colors and Syntax Highlighting
+Plug 'altercation/vim-colors-solarized' " Precision colorscheme for the vim text editor         | https://github.com/altercation/vim-colors-solarized
+" Plug 'kaicataldo/material.vim'          " Vim/Neovim Material color scheme                      | https://github.com/kaicataldo/material.vim
+Plug 'hail2u/vim-css3-syntax'           " CSS3 syntax                                           | https://github.com/hail2u/vim-css3-syntax
+Plug 'cakebaker/scss-syntax.vim'        " Vim syntax file for scss (Sassy CSS)                  | https://github.com/cakebaker/scss-syntax.vim
+Plug 'pangloss/vim-javascript',
+      \ { 'for': ['javascript', 'vue']
+      \}                                " Javascript indentation and syntax support in Vim.     | https://github.com/pangloss/vim-javascript
+Plug 'digitaltoad/vim-pug'              " Vim Pug (formerly Jade) syntax highlighting           | https://github.com/digitaltoad/vim-pug
+Plug 'posva/vim-vue'                    " Syntax Highlight for Vue.js components                | https://github.com/posva/vim-vue
+Plug 'chrisbra/Colorizer'               " A plugin to color colornames and codes                | https://github.com/chrisbra/Colorizer
+Plug 'elzr/vim-json'                    " A better JSON for Vim                                 | https://github.com/elzr/vim-json
+
+" Tim Pope
+Plug 'tpope/vim-endwise'                " Add 'end' keyword when needed                         | https://github.com/tpope/vim-endwise
+Plug 'tpope/vim-surround'               " Quoting/parenthesizing made simple                    | https://github.com/tpope/vim-surround
+Plug 'tpope/vim-rails'                  " Ruby on Rails power tools                             | https://github.com/tpope/vim-rails
+Plug 'tpope/vim-obsession'              " Continuously updated session files                    | https://github.com/tpope/vim-obsession
+Plug 'tpope/vim-fugitive'               " Tim Pope's Git wrapper                                | https://github.com/tpope/vim-fugitive
+Plug 'tpope/vim-repeat'                 " Enable repeating supported plugin maps with '.'       | https://github.com/tpope/vim-repeat
+Plug 'tpope/vim-sensible'               " Defaults everyone can agree on                        | https://github.com/tpope/vim-sensible
+
+" Testing & Tmux
+Plug 'thoughtbot/vim-rspec'             " Run Rspec specs from Vim                              | https://github.com/thoughtbot/vim-rspec
+Plug 'christoomey/vim-tmux-runner'      " Command runner for sending commands from vim to tmux. | https://github.com/christoomey/vim-tmux-runner
+
+call plug#end()
+
+" Plugin-specifc Mappings & Settings
+
+" deoplete
+let g:deoplete#enable_at_startup = 1
+
+" UltiSnips
+let g:UltiSnipsEditSplit = 'horizontal'
+let g:UltiSnipsSnippetsDir = '~/.vim/UltiSnips'
+let g:ultisnips_javascript = {
+     \ 'keyword-spacing': 'always',
+     \ 'semi': 'never',
+     \ 'space-before-function-paren': 'always',
+     \ }
+
+" CSS Omni Complete Function for CSS3
+augroup csscomplete
+  autocmd!
+  autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS noci
+augroup END
+
+" Far.vim
+let g:far#source = 'agnvim'
+let g:far#file_mask_favorites = ['%', '**/*.*', '**/*.html', '**/*.haml', '**/*.js', '**/*.css', '**/*.scss', '**/*.rb']
+
+" ack.vim
+if executable('ag')
+  let g:ackprg = 'ag --vimgrep'
+endif
 
 " NERDTree
 nmap <silent> <F3> :NERDTreeToggle<CR>
 map <leader>\ :NERDTreeToggle<CR>
-let g:NERDTreeWinSize=25
 let NERDTreeShowHidden=1
-let g:NERDTreeDirArrowExpandable = '▸'
-let g:NERDTreeDirArrowCollapsible = '▾'
+let NERDTreeIgnore=['\.png$', '\.jpg$', '\.gif$', '\.mp3$', '\.ogg$', '\.mp4$',
+                  \ '\.avi$','.webm$','.mkv$','\.pdf$', '\.zip$', '\.tar.gz$',
+                  \ '\.rar$']
 
-" Toggle GitGutter
-nnoremap <F4> :GitGutterToggle<CR>
+" GitGutter
+nnoremap <F6> :GitGutterToggle<CR>
+nnoremap <F7> :GitGutterLineHighlightsToggle<CR>
+let g:gitgutter_terminal_reports_focus=0
+
+" GitGutter default mapping reference
+" https://github.com/airblade/vim-gitgutter#getting-started
+" <leader>hp - Preview hunk
+" <leader>hs - Stage hunk
+" <leader>hu - Undo hunk
 
 " Tcomment
 map <leader>/ :TComment<CR>
@@ -290,13 +408,29 @@ map <leader>a :call RunAllSpecs()<CR>
 let g:rspec_command = 'VtrSendCommandToRunner! clear; bin/rspec {spec}'
 
 " vim-tmux-runner
-let g:VtrPercentage = 20
+let g:VtrPercentage = 25
 let g:VtrUseVtrMaps = 1
 nnoremap <leader>sd :VtrSendCtrlD<cr>
 nmap <leader>fs :VtrFlushCommand<cr>:VtrSendCommandToRunner<cr>
-nmap <leader>osp :VtrOpenRunner {'orientation': 'h', 'percentage': 20, 'cmd': '' }<cr>
+nmap <leader>v3 :VtrAttachToPane 3<cr>
+nmap <leader>v4 :VtrAttachToPane 4<cr>
+nmap <leader>osp :VtrOpenRunner {'orientation': 'h', 'percentage': 25, 'cmd': '' }<cr>
 nmap <leader>orc :VtrOpenRunner {'orientation': 'h', 'percentage': 40, 'cmd': 'rc'}<cr>
 nmap <leader>opr :VtrOpenRunner {'orientation': 'h', 'percentage': 40, 'cmd': 'pry'}<cr>
+
+" vim-tmux-runner default mappings
+" nnoremap <leader>va :VtrAttachToPane<cr>
+" nnoremap <leader>ror :VtrReorientRunner<cr>
+" nnoremap <leader>sc :VtrSendCommandToRunner<cr>
+" nnoremap <leader>sl :VtrSendLinesToRunner<cr>
+" vnoremap <leader>sl :VtrSendLinesToRunner<cr>
+" nnoremap <leader>or :VtrOpenRunner<cr>
+" nnoremap <leader>kr :VtrKillRunner<cr>
+" nnoremap <leader>fr :VtrFocusRunner<cr>
+" nnoremap <leader>dr :VtrDetachRunner<cr>
+" nnoremap <leader>cr :VtrClearRunner<cr>
+" nnoremap <leader>fc :VtrFlushCommand<cr>
+" nnoremap <leader>sf :VtrSendFile<cr>
 
 " CtrlP
 map <leader>t <C-p>
@@ -309,28 +443,47 @@ let g:ctrlp_max_height = 15
 let g:ctrlp_arg_map = 1
 
 " CtrlP -> files matched are ignored when expanding wildcards
-set wildignore+=*/.git/*,*.tmp/*,*/.hg/*,*/.svn/*.,*/.DS_Store
+set wildignore+=*/.git/*,*.tmp/*,*/.hg/*,*/.svn/*.,*/.DS_Store,*/tmp,*/dist,*/.nuxt
 
 " CtrlP -> directories to ignore when fuzzy finding
 let g:ctrlp_custom_ignore = '\v[\/]((build|node_modules)|\.(git|sass-cache))$'
 
 " Custom rails.vim commands
-command! Rroutes :e config/routes.rb
-command! RTroutes :tabe config/routes.rb
-command! RSroutes :sp config/routes.rb
-command! RVroutes :vs config/routes.rb
-command! Rfactories :e spec/factories.rb
-command! RTfactories :tabe spec/factories.rb
-command! RSfactories :sp spec/factories.rb
-command! RVfactories :vs spec/factories.rb
+" command! Rroutes :e config/routes.rb
+" command! RTroutes :tabe config/routes.rb
+" command! RSroutes :sp config/routes.rb
+" command! RVroutes :vs config/routes.rb
+" command! Rfactories :e spec/factories.rb
+" command! RTfactories :tabe spec/factories.rb
+" command! RSfactories :sp spec/factories.rb
+" command! RVfactories :vs spec/factories.rb
 
-" Syntastic
-let g:syntastic_scss_checkers = ['scss_lint']
-let g:syntastic_haml_checkers = ['haml_lint']
-let g:syntastic_javascript_checkers = ['eslint']
+" ALE | https://github.com/w0rp/ale#1-supported-languages-and-tools
+let g:ale_completion_enabled = 1
+let g:ale_sign_error = '⌦'
+let g:ale_sign_warning = '∙∙'
+
+let g:ale_fixers = {
+      \ 'javascript': ['eslint'],
+      \ 'vue': ['eslint', 'stylelint'],
+      \}
+
+let g:ale_lint_on_save = 1
+let g:ale_fix_on_save = 1
+
+let g:ale_linters = {
+      \ 'javascript': ['eslint'],
+      \ 'vue': ['eslint', 'stylelint'],
+      \}
+
+let g:ale_linter_aliases = {'vue': ['javascript', 'css']}
+
+let g:ale_pattern_options = {
+\   '.*\.json$': {'ale_enabled': 0}
+\}
 
 " Key mappings for dragvisuals.vim
-runtime bundle/dragvisuals/plugins/dragvisuals.vim
+runtime plugged/dragvisuals/plugins/dragvisuals.vim
 
 vmap  <expr>  <LEFT>   DVB_Drag('left')
 vmap  <expr>  <RIGHT>  DVB_Drag('right')
@@ -341,162 +494,67 @@ vmap  <expr>  D        DVB_Duplicate()
 " Remove any introduced trailing whitespace after moving...
 let g:DVB_TrimWS = 1
 
-" }}}
+" Tagbar
+nmap <F8> :TagbarToggle<CR>
 
-" Commands {{{
+" Colorizer
+let g:colorizer_auto_filetype='css,html,javascript,vue'
 
-" specify syntax highlighting for specific files
-autocmd Bufread,BufNewFile *.spv set filetype=php
-autocmd Bufread,BufNewFile aliases,functions,prompt,tmux,oh-my-zsh set filetype=zsh
-autocmd Bufread,BufNewFile *.md set filetype=markdown " Vim interprets .md as 'modula2' otherwise, see :set filetype?
+" Vim REST Console (VRC)
+let g:vrc_curl_opts = {
+  \ '-L': '',
+  \ '-i': '',
+\}
 
-" When loading text files, wrap them and don't split up words.
-au BufNewFile,BufRead *.txt setlocal lbr
-au BufNewFile,BufRead *.txt setlocal nolist " Don't display whitespace
+"}}}
 
-" file formats
-autocmd Filetype gitcommit setlocal spell textwidth=72
-autocmd Filetype sh,markdown setlocal wrap linebreak nolist textwidth=0 wrapmargin=0 " http://vim.wikia.com/wiki/Word_wrap_without_line_breaks
-autocmd FileType sh,cucumber,ruby,yaml,html,xml,zsh,vim,css,scss,javascript,gitconfig setlocal shiftwidth=2 tabstop=2 expandtab
+" Appearance {{{
 
-" autoindent with two spaces, always expand tabs
-autocmd FileType ruby,eruby,yaml setlocal ai sw=2 sts=2 et
-autocmd FileType ruby,eruby,yaml setlocal path+=lib
-
-" Enable spellchecking for Markdown
-autocmd FileType markdown setlocal spell
-
-" Remove trailing whitespace on save for ruby files.
-au BufWritePre *.rb :%s/\s\+$//e
-
-" Fold settings
-autocmd BufRead * setlocal foldmethod=marker
-autocmd BufRead * normal zM
-" autocmd BufRead *.rb setlocal foldmethod=syntax
-" autocmd BufRead *.rb normal zR
-" set foldnestmax=3
-
-" Close vim if only nerdtree window is left
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-
-" Change colourscheme when diffing
-fun! SetDiffColors()
-  highlight DiffAdd    cterm=bold ctermfg=white ctermbg=DarkGreen
-  highlight DiffDelete cterm=bold ctermfg=white ctermbg=DarkGrey
-  highlight DiffChange cterm=bold ctermfg=white ctermbg=DarkBlue
-  highlight DiffText   cterm=bold ctermfg=white ctermbg=DarkRed
-endfun
-autocmd FilterWritePre * call SetDiffColors()
-
-" Unmap GitGutter leaders that I don't use. This avoids delays for other leaders.
-autocmd VimEnter * nunmap <leader>hp
-autocmd VimEnter * nunmap <leader>hr
-autocmd VimEnter * nunmap <leader>hs
-
-" Unmap Bufexplorer leaders that I don't use. This avoids delays for other leaders.
-autocmd VimEnter * nunmap <leader>bs
-autocmd VimEnter * nunmap <leader>bv
-
-" automatically rebalance windows on vim resize
-autocmd VimResized * :wincmd =
-
-" }}}
-
-" Airline (status line) {{{
-" https://github.com/bling/vim-airline
-
-if !exists('g:airline_symbols')
-  let g:airline_symbols = {}
-endif
-
-let g:airline_powerline_fonts=1
-
-let g:airline_symbols.branch = ''
-let g:airline_symbols.readonly = ''
-let g:airline_symbols.linenr = ''
-let g:airline_symbols.crypt = '🔒'
-
-let g:airline_left_sep=''
-let g:airline_right_sep=''
-let g:airline_left_sep = ''
-let g:airline_left_alt_sep = ''
-let g:airline_right_sep = ''
-let g:airline_right_alt_sep = ''
-
-" For more intricate customizations, you can replace the predefined sections
-" with the usual statusline syntax.
-"
-" Note: If you define any section variables it will replace the default values
-" entirely.  If you want to disable only certain parts of a section you can try
-" using variables defined in the |airline-configuration| or |airline-extensions|
-" section.
-" >
-"   variable names                default contents
-"   ----------------------------------------------------------------------------
-"   let g:airline_section_a       (mode, crypt, paste, iminsert)
-"   let g:airline_section_b       (hunks, branch)
-"   let g:airline_section_c       (bufferline or filename)
-"   let g:airline_section_gutter  (readonly, csv)
-"   let g:airline_section_x       (tagbar, filetype, virtualenv)
-"   let g:airline_section_y       (fileencoding, fileformat)
-"   let g:airline_section_z       (percentage, line number, column number)
-"   let g:airline_section_error   (ycm_error_count, syntastic, eclim)
-"   let g:airline_section_warning (ycm_warning_count, whitespace)
-
-  " here is an example of how you could replace the branch indicator with
-  " the current working directory, followed by the filename.
-  " let g:airline_section_b = '%{getcwd()}'
-  " let g:airline_section_c = '%t%m'
-
-let g:airline#extensions#default#section_truncate_width = {
-    \ 'y': 100,
-    \ }
-
-let g:airline#extensions#default#layout = [
-    \ [ 'a', 'b', 'c' ],
-    \ [ 'x', 'y', 'z', 'error', 'warning' ]
-    \ ]
-
-" airline branch settings
-" let g:airline#extensions#branch#enabled = 1
-" let g:airline#extensions#branch#displayed_head_limit = 10
-
-  " default value leaves the name unmodifed
-  " let g:airline#extensions#branch#format = 0
-
-  " to only show the tail, e.g. a branch 'feature/foo' becomes 'foo', use
-  " let g:airline#extensions#branch#format = 1
-
-  " to truncate all path sections but the last one, e.g. a branch
-  " 'foo/bar/baz' becomes 'f/b/baz', use
-  " let g:airline#extensions#branch#format = 2
-
-" airline hunk settings
-
-" enable/disable showing a summary of changed hunks under source control
-" let g:airline#extensions#hunks#enabled = 1
-
-" enable/disable showing only non-zero hunks
-let g:airline#extensions#hunks#non_zero_only = 1
-
-" set hunk count symbols
-" let g:airline#extensions#hunks#hunk_symbols = ['+', '~', '-']
-
-" }}}
-
-" Colorscheme {{{
-
-" set background=light " light theme
-set background=dark " dark theme
+set background=dark
 colorscheme solarized
+let g:solarized_diffmode="high"
+let g:solarized_termtrans = 1 " Use terminal background
+" colorscheme material
 
 highlight clear IncSearch
 highlight IncSearch term=reverse cterm=reverse ctermfg=7 ctermbg=0 guifg=Black guibg=Yellow
 highlight VertSplit ctermbg=NONE guibg=NONE
+
+function! GitBranch()
+  return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
+endfunction
+
+function! StatuslineGit()
+  let l:branchname = GitBranch()
+  return strlen(l:branchname) > 0?'  '.l:branchname.' ':''
+endfunction
+
+" Statusline appearance
+set statusline=
+set statusline+=%#PmenuSel#
+set statusline+=%{StatuslineGit()}
+set statusline+=%#CursorLine#
+set statusline+=%<
+set statusline+=\ %f
+set statusline+=%m
+set statusline+=%=
+set statusline+=%#StatusLine#
+set statusline+=\ %y
+set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
+set statusline+=\[%{&fileformat}\]
+set statusline+=\ %P
+set statusline+=\ %l:%c
+set statusline+=\ 
+set statusline+=%{ObsessionStatus('●','❙❙','■')}
+set statusline+=\ 
+set statusline+=%h%r
 " }}}
 
-" Include local settings {{{
+" Local {{{
+
 if filereadable(glob("$HOME/.vimrc.local"))
   source $HOME/.vimrc.local
 endif
 " }}}
+
+" vim: fdm=marker fen
